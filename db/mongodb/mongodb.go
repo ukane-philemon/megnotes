@@ -7,6 +7,7 @@ import (
 	"log/slog"
 
 	"github.com/ukane-philemon/megtask/webserver"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -14,6 +15,11 @@ import (
 
 const (
 	taskDB = "megTasks"
+
+	usersCollection = "users"
+
+	// Keys
+	usernameKey = "username"
 )
 
 // Check that *MongoDB satisfies webserver.TaskDatabase.
@@ -21,8 +27,10 @@ var _ webserver.TaskDatabase = (*MongoDB)(nil)
 
 // MongoDB implements webserver.TaskDatabase.
 type MongoDB struct {
-	db  *mongo.Database
-	log *slog.Logger
+	ctx             context.Context
+	db              *mongo.Database
+	usersCollection *mongo.Collection
+	log             *slog.Logger
 }
 
 // New connects to a mongo database and returns a new instance of *MongoDB.
@@ -50,9 +58,23 @@ func New(ctx context.Context, connectionURL string, logger *slog.Logger) (*Mongo
 
 	logger.Info("Database has been connected and pinged successfully...")
 
+	db := client.Database(taskDB)
+
+	// Create a unique index on the users collection.
+	usersCollection := db.Collection(usersCollection)
+	usersCollection.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys: bson.D{{
+			Key:   usernameKey,
+			Value: 1,
+		}},
+		Options: options.Index().SetUnique(true),
+	})
+
 	return &MongoDB{
-		db:  client.Database(taskDB),
-		log: logger,
+		ctx:             ctx,
+		db:              db,
+		usersCollection: usersCollection,
+		log:             logger,
 	}, nil
 }
 

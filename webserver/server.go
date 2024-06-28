@@ -22,6 +22,7 @@ type WebServer struct {
 func New(db TaskDatabase, log *slog.Logger) *WebServer {
 	chiMux := chi.NewMux()
 	chiMux.Use(middleware.Logger)
+	chiMux.Use(middleware.AllowContentType("application/json"))
 
 	server := &WebServer{
 		mux:    chiMux,
@@ -85,6 +86,8 @@ func (s *WebServer) Start(ctx context.Context) error {
 // registerRoutes registers all the required routes on s.mux.
 func (s *WebServer) registerRoutes() {
 	s.mux.Get("/", s.handleHome)
+
+	s.mux.Post("/create-account", s.handleCreateAccount)
 }
 
 // handleHome handles the "GET /" endpoint and returns a server message.
