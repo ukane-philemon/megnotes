@@ -1,5 +1,11 @@
 package db
 
+import "errors"
+
+var (
+	ErrorInvalidRequest = errors.New("invalid request")
+)
+
 // User is information about a user.
 type User struct {
 	ID             string `json:"id"`
