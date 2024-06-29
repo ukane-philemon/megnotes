@@ -31,3 +31,8 @@ func (caq *usernameAndPassword) Validate() error {
 
 	return nil
 }
+
+// createTaskRequest is information required to create new task.
+type createTaskRequest struct {
+	TaskDetail string `json:"taskDetail"`
+}

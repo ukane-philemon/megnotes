@@ -9,7 +9,7 @@ require (
 )
 
 require (
-	github.com/cristalhq/jwt v1.2.0
+	github.com/cristalhq/jwt/v4 v4.0.2
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect

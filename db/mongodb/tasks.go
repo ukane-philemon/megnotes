@@ -3,14 +3,50 @@ package mongodb
 import (
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/ukane-philemon/megtask/db"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // CreateTask creates a new task entry for a user.
 func (mdb *MongoDB) CreateTask(userID string, taskDetail string) ([]*db.Task, error) {
-	return nil, nil
+	if userID == "" || taskDetail == "" {
+		return nil, fmt.Errorf("%w: missing required arguments", db.ErrorInvalidRequest)
+	}
+
+	userDBID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, fmt.Errorf("primitive.ObjectIDFromHex error: %w", err)
+	}
+
+	// Check if user really exists.
+	filter := bson.M{dbIDKey: userDBID}
+	nUsersFound, err := mdb.usersCollection.CountDocuments(mdb.ctx, filter)
+	if err != nil {
+		return nil, fmt.Errorf("usersCollection.CountDocuments error: %w", err)
+	}
+
+	if nUsersFound != 1 {
+		return nil, fmt.Errorf("expected userID to match one user, got %d", nUsersFound)
+	}
+
+	taskInfo := &dbTask{
+		ID:      primitive.NewObjectID(),
+		OwnerID: userID,
+		TaskInfo: db.TaskInfo{
+			Detail:    taskDetail,
+			Timestamp: time.Now().Unix(),
+		},
+	}
+
+	_, err = mdb.tasksCollection.InsertOne(mdb.ctx, taskInfo)
+	if err != nil {
+		return nil, fmt.Errorf("tasksCollection.InsertOne error: %w", err)
+	}
+
+	return mdb.userTasks(userID)
 }
 
 // Tasks returns all the tasks created by the provided userID.
@@ -45,7 +81,7 @@ func (mdb *MongoDB) userTasks(userID string) ([]*db.Task, error) {
 	}
 
 	var dbTasks []*dbTask
-	err = cur.Decode(&dbTasks)
+	err = cur.All(mdb.ctx, &dbTasks)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode retrieved tasks: %w", err)
 	}
