@@ -116,7 +116,7 @@ func (mdb *MongoDB) UpdateTask(userID, taskID string, newTaskDetail string, mark
 	}
 
 	if res.MatchedCount == 0 {
-		return nil, fmt.Errorf("task with id %s does not exist", taskID)
+		return nil, fmt.Errorf("%w: task does not exist", db.ErrorInvalidRequest)
 	}
 
 	return mdb.userTasks(userID, nil)
@@ -126,7 +126,33 @@ func (mdb *MongoDB) UpdateTask(userID, taskID string, newTaskDetail string, mark
 // match the provided userID. If no task match the provided taskID, an
 // ErrorInvalidRequest is returned.
 func (mdb *MongoDB) DeleteTask(userID, taskID string) ([]*db.Task, error) {
-	return nil, nil
+	if userID == "" || taskID == "" {
+		return nil, fmt.Errorf("%w: missing required argument(s)", db.ErrorInvalidRequest)
+	}
+
+	taskDBID, err := primitive.ObjectIDFromHex(taskID)
+	if err != nil {
+		return nil, fmt.Errorf("primitive.ObjectIDFromHex error: %w", err)
+	}
+
+	filter := bson.M{
+		ownerIDKey: userID,
+		dbIDKey:    taskDBID,
+	}
+
+	res, err := mdb.tasksCollection.DeleteOne(mdb.ctx, filter)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("%w: task does not exist", db.ErrorInvalidRequest)
+		}
+		return nil, fmt.Errorf("tasksCollection.FindOne error: %w", err)
+	}
+
+	if res.DeletedCount == 0 {
+		return nil, fmt.Errorf("%w: task does not exist", db.ErrorInvalidRequest)
+	}
+
+	return mdb.userTasks(userID, nil)
 }
 
 // userTasks returns a list of tasks for the user with the provided userID.

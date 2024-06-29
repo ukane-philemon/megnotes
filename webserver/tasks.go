@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/ukane-philemon/megtask/db"
 )
 
@@ -105,6 +106,26 @@ func (s *WebServer) handleUpdateTask(res http.ResponseWriter, req *http.Request)
 			s.writeBadRequest(res, err.Error())
 		} else {
 			s.writeServerError(res, fmt.Errorf("taskDB.UpdateTask: %w", err))
+		}
+		return
+	}
+
+	s.writeSuccess(res, map[string]any{
+		"tasks": userTasks,
+	})
+}
+
+// handleDeleteTask handles the "DELETE /task/{taskID}" endpoint and removes an
+// existing task from a user's record.
+func (s *WebServer) handleDeleteTask(res http.ResponseWriter, req *http.Request) {
+	taskID := chi.URLParam(req, "taskID")
+	userID := s.reqUserID(req)
+	userTasks, err := s.taskDB.DeleteTask(userID, taskID)
+	if err != nil {
+		if errors.Is(err, db.ErrorInvalidRequest) {
+			s.writeBadRequest(res, err.Error())
+		} else {
+			s.writeServerError(res, fmt.Errorf("taskDB.DeleteTask: %w", err))
 		}
 		return
 	}
