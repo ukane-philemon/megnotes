@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -70,6 +71,41 @@ func (s *WebServer) handleRetrieveTasks(res http.ResponseWriter, req *http.Reque
 	}
 	if err != nil {
 		s.writeServerError(res, fmt.Errorf("%s error: %w", methodName, err))
+		return
+	}
+
+	s.writeSuccess(res, map[string]any{
+		"tasks": userTasks,
+	})
+}
+
+// handleUpdateTask handles the "PATCH /task" endpoint and updates an existing
+// task. A task that has been completed cannot be updated back to pending.
+func (s *WebServer) handleUpdateTask(res http.ResponseWriter, req *http.Request) {
+	form := new(updateTaskRequest)
+	if !s.readPostBody(res, req, &form) {
+		return
+	}
+
+	if form.TaskID == "" || (form.TaskDetail == "" && !form.MarkAsCompleted) {
+		s.writeBadRequest(res, "missing required data")
+		return
+	}
+
+	var markAsCompleted *bool
+	if form.MarkAsCompleted {
+		markAsCompleted = &form.MarkAsCompleted
+	}
+
+	userID := s.reqUserID(req)
+
+	userTasks, err := s.taskDB.UpdateTask(userID, form.TaskID, form.TaskDetail, markAsCompleted)
+	if err != nil {
+		if errors.Is(err, db.ErrorInvalidRequest) {
+			s.writeBadRequest(res, err.Error())
+		} else {
+			s.writeServerError(res, fmt.Errorf("taskDB.UpdateTask: %w", err))
+		}
 		return
 	}
 

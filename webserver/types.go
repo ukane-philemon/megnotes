@@ -36,3 +36,11 @@ func (caq *usernameAndPassword) Validate() error {
 type createTaskRequest struct {
 	TaskDetail string `json:"taskDetail"`
 }
+
+// updateTaskRequest is information that may be provided to update a task. Both cannot
+// be empty.
+type updateTaskRequest struct {
+	TaskID          string `json:"taskID"`
+	TaskDetail      string `json:"taskDetail"` // optional
+	MarkAsCompleted bool   `json:"markAsCompleted"`
+}
