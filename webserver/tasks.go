@@ -80,15 +80,16 @@ func (s *WebServer) handleRetrieveTasks(res http.ResponseWriter, req *http.Reque
 	})
 }
 
-// handleUpdateTask handles the "PATCH /task" endpoint and updates an existing
-// task. A task that has been completed cannot be updated back to pending.
+// handleUpdateTask handles the "PATCH /task/{taskID}" endpoint and updates an
+// existing task. A task that has been completed cannot be updated back to
+// pending.
 func (s *WebServer) handleUpdateTask(res http.ResponseWriter, req *http.Request) {
 	form := new(updateTaskRequest)
 	if !s.readPostBody(res, req, &form) {
 		return
 	}
 
-	if form.TaskID == "" || (form.TaskDetail == "" && !form.MarkAsCompleted) {
+	if form.TaskDetail == "" && !form.MarkAsCompleted {
 		s.writeBadRequest(res, "missing required data")
 		return
 	}
@@ -98,9 +99,10 @@ func (s *WebServer) handleUpdateTask(res http.ResponseWriter, req *http.Request)
 		markAsCompleted = &form.MarkAsCompleted
 	}
 
+	taskID := chi.URLParam(req, "taskID")
 	userID := s.reqUserID(req)
 
-	userTasks, err := s.taskDB.UpdateTask(userID, form.TaskID, form.TaskDetail, markAsCompleted)
+	userTasks, err := s.taskDB.UpdateTask(userID, taskID, form.TaskDetail, markAsCompleted)
 	if err != nil {
 		if errors.Is(err, db.ErrorInvalidRequest) {
 			s.writeBadRequest(res, err.Error())
