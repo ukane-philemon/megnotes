@@ -18,6 +18,8 @@ type TaskDatabase interface {
 	CreateTask(userID string, taskDetail string) ([]*db.Task, error)
 	// Tasks returns all the tasks created by the provided userID.
 	Tasks(userID string) ([]*db.Task, error)
+	// TasksWithStatus returns user tasks that matches the provided filter.
+	TasksWithStatus(userID string, completed bool) ([]*db.Task, error)
 	// UpdateTask updates an existing task for the provided userID. If no task
 	// match the provided taskID, an ErrorInvalidRequest is returned.
 	UpdateTask(userID, taskID string, newTaskDetail string) ([]*db.Task, error)
@@ -25,8 +27,6 @@ type TaskDatabase interface {
 	// match the provided userID. If no task match the provided taskID, an
 	// ErrorInvalidRequest is returned.
 	DeleteTask(userID, taskID string) ([]*db.Task, error)
-	// TasksWithStatus returns user tasks that match the provided filter.
-	TasksWithStatus(userID string, completed bool) ([]*db.Task, error)
 	// Shutdown gracefully disconnects the database after the server is
 	// shutdown.
 	Shutdown(ctx context.Context) error

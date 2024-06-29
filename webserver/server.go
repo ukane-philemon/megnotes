@@ -109,6 +109,7 @@ func (s *WebServer) registerRoutes() {
 		authedMux.Use(s.authMiddleware)
 
 		authedMux.Post("/task", s.handleCreateTask)
+		authedMux.Get("/tasks", s.handleRetrieveTasks)
 	})
 }
 

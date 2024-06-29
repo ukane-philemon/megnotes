@@ -20,9 +20,10 @@ const (
 	taskCollection  = "tasks"
 
 	// Keys
-	dbIDKey     = "_id"
-	usernameKey = "username"
-	ownerIDKey  = "ownerID"
+	dbIDKey      = "_id"
+	usernameKey  = "username"
+	ownerIDKey   = "ownerID"
+	completedKey = "completed"
 )
 
 // Check that *MongoDB satisfies webserver.TaskDatabase.
