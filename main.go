@@ -38,7 +38,13 @@ func main() {
 		cancel()
 	}()
 
-	server := webserver.New(db, logger)
+	server, err := webserver.New(db, logger)
+	if err != nil {
+		println("webserver.New error: ", err.Error())
+		os.Exit(1)
+	}
+
+	// Start server.
 	err = server.Start(ctx)
 	if err != nil {
 		println("webServer exited with unexpected error: ", err.Error())

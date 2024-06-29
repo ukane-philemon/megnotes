@@ -8,14 +8,15 @@ import (
 
 var usernameRegex = regexp.MustCompile("^[a-zA-Z0-9]+$")
 
-// createAccountRequest is the information required to create and account.
-type createAccountRequest struct {
+// usernameAndPassword is information required to create an account or login an
+// existing user.
+type usernameAndPassword struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
 // Validate ensures valid data is provided in createAccountRequest.
-func (caq *createAccountRequest) Validate() error {
+func (caq *usernameAndPassword) Validate() error {
 	// Username cannot contain special characters.
 	if caq.Username == "" || !usernameRegex.MatchString(caq.Username) {
 		return errors.New("username can only contain alphanumeric characters")

@@ -1,6 +1,8 @@
 package db
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	ErrorInvalidRequest = errors.New("invalid request")
@@ -8,15 +10,18 @@ var (
 
 // User is information about a user.
 type User struct {
-	ID             string `json:"id"`
-	Username       string `json:"username"`
-	TasksCompleted int    `json:"tasksCompleted"`
-	TasksPending   int    `json:"tasksPending"`
+	ID       string  `json:"id"`
+	Username string  `json:"username"`
+	Tasks    []*Task `json:"tasks"`
 }
 
 // Task is information about a user's task item.
 type Task struct {
-	ID        string `json:"id"`
+	ID string `json:"id"`
+	TaskInfo
+}
+
+type TaskInfo struct {
 	Detail    string `json:"detail"`
 	Completed bool   `json:"completed"`
 	Timestamp int64  `json:"timestamp"`
