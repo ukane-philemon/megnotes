@@ -1,0 +1,598 @@
+{
+	"info": {
+		"_postman_id": "bf7972b2-c46e-4bc0-95df-6928df3536bc",
+		"name": "MEGTASK",
+		"description": "MEGTASK is a simple task management application (HTTP API) to manage daily tasks.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "9797704"
+	},
+	"item": [
+		{
+			"name": "create-account",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"behindtextdev\",\n    \"password\": \"12345\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{baseURL}}/create-account"
+			},
+			"response": [
+				{
+					"name": "Create Account Successful",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"behindtextdev\",\n    \"password\": \"1234567\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/create-account"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Fri, 28 Jun 2024 23:44:03 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "60"
+						},
+						{
+							"key": "Content-Type",
+							"value": "text/plain; charset=utf-8"
+						}
+					],
+					"cookie": [],
+					"body": "{\"message\":\"Account created successfully, proceed to login\"}"
+				},
+				{
+					"name": "Invalid Request",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"behindtextdev\",\n    \"password\": \"1234567\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/create-account"
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Fri, 28 Jun 2024 23:46:50 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "63"
+						},
+						{
+							"key": "Content-Type",
+							"value": "text/plain; charset=utf-8"
+						}
+					],
+					"cookie": [],
+					"body": "{\"errorMessage\":\"invalid request: please try another username\"}"
+				}
+			]
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"behindtextdev\",\n    \"password\": \"1234567\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{baseURL}}/login"
+			},
+			"response": [
+				{
+					"name": "Login Successful",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"behindtextdev\",\n    \"password\": \"1234567\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/login"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 29 Jun 2024 01:33:52 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "569"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"name": "Content-Type",
+							"description": "",
+							"type": "text"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"authToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NjdmNGFjMzAwODBlNjk3MGQ2Y2YyZGMiLCJhdWQiOiJVc2VyIiwiaXNzIjoiTWVnVGFzayIsImV4cCI6MTcxOTYyNTczMiwiaWF0IjoxNzE5NjI0ODMyfQ.pAr6qbu7PAEq_37mdTfc1UHtF1_byPo8bruGGPi1W1E\",\n    \"message\": \"Login successful.\",\n    \"userInfo\": {\n        \"id\": \"667f4ac30080e6970d6cf2dc\",\n        \"username\": \"behindtextdev\",\n        \"tasks\": [\n            {\n                \"id\": \"667f645afbaa8f8b550a9b0e\",\n                \"detail\": \"Wash the dish before dawn\",\n                \"completed\": false,\n                \"timestamp\": 1719624794\n            },\n            {\n                \"id\": \"667f6440fbaa8f8b550a9b0d\",\n                \"detail\": \"Finish task before dawn and eat\",\n                \"completed\": false,\n                \"timestamp\": 1719624768\n            }\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "task",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": {
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NjdmNGFjMzAwODBlNjk3MGQ2Y2YyZGMiLCJhdWQiOiJVc2VyIiwiaXNzIjoiTWVnVGFzayIsImV4cCI6MTcxOTYyNzMyMiwiaWF0IjoxNzE5NjI2NDIyfQ.FZfKzk6HYR10sQkU_ynhKWnOBgZ10ZzPT0eRT7gthok",
+						"in": "header",
+						"key": "Megtask-Authentication-Token"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"taskDetail\": \"Go for workout\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{baseURL}}/task"
+			},
+			"response": [
+				{
+					"name": "Create Task Successful",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"taskDetail\": \"Wash the dish before dawn\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/task"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 29 Jun 2024 01:33:14 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "241"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"name": "Content-Type",
+							"description": "",
+							"type": "text"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"tasks\": [\n        {\n            \"id\": \"667f645afbaa8f8b550a9b0e\",\n            \"detail\": \"Wash the dish before dawn\",\n            \"completed\": false,\n            \"timestamp\": 1719624794\n        },\n        {\n            \"id\": \"667f6440fbaa8f8b550a9b0d\",\n            \"detail\": \"Finish task before dawn and eat\",\n            \"completed\": false,\n            \"timestamp\": 1719624768\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "tasks",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": {
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NjdmNGFjMzAwODBlNjk3MGQ2Y2YyZGMiLCJhdWQiOiJVc2VyIiwiaXNzIjoiTWVnVGFzayIsImV4cCI6MTcxOTYyOTg0NiwiaWF0IjoxNzE5NjI4OTQ2fQ.2aC9JlgRd9cGshQ2vqAMAeXFlMZT9HaG83QYAKHXBRg",
+						"in": "header",
+						"key": "Megtask-Authentication-Token"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/tasks?status=completed",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"tasks"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "completed"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get Tasks Successful",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseURL}}/tasks"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 29 Jun 2024 02:01:46 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "342"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"name": "Content-Type",
+							"description": "",
+							"type": "text"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"tasks\": [\n        {\n            \"id\": \"667f6ad3f6ced4b29045fa4c\",\n            \"detail\": \"Go for workout\",\n            \"completed\": false,\n            \"timestamp\": 1719626451\n        },\n        {\n            \"id\": \"667f645afbaa8f8b550a9b0e\",\n            \"detail\": \"Wash the dish before dawn\",\n            \"completed\": false,\n            \"timestamp\": 1719624794\n        },\n        {\n            \"id\": \"667f6440fbaa8f8b550a9b0d\",\n            \"detail\": \"Finish task before dawn and eat\",\n            \"completed\": false,\n            \"timestamp\": 1719624768\n        }\n    ]\n}"
+				},
+				{
+					"name": "Get Pending Tasks Successful",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/tasks?status=pending",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"tasks"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "pending"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 29 Jun 2024 02:42:49 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "342"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"name": "Content-Type",
+							"description": "",
+							"type": "text"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"tasks\": [\n        {\n            \"id\": \"667f73c2e554673326841c59\",\n            \"detail\": \"Go for workout\",\n            \"completed\": false,\n            \"timestamp\": 1719628738\n        },\n        {\n            \"id\": \"667f645afbaa8f8b550a9b0e\",\n            \"detail\": \"Wash the dish before dawn\",\n            \"completed\": false,\n            \"timestamp\": 1719624794\n        },\n        {\n            \"id\": \"667f6440fbaa8f8b550a9b0d\",\n            \"detail\": \"Finish task before dawn and eat\",\n            \"completed\": false,\n            \"timestamp\": 1719624768\n        }\n    ]\n}"
+				},
+				{
+					"name": "Get Completed Tasks Successful",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/tasks?status=completed",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"tasks"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "completed"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 29 Jun 2024 02:43:30 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "117"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"name": "Content-Type",
+							"description": "",
+							"type": "text"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"tasks\": [\n        {\n            \"id\": \"667f6ad3f6ced4b29045fa4c\",\n            \"detail\": \"Finish marathon race\",\n            \"completed\": true,\n            \"timestamp\": 1719626451\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "task/{taskID}",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": {
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NjdmNGFjMzAwODBlNjk3MGQ2Y2YyZGMiLCJhdWQiOiJVc2VyIiwiaXNzIjoiTWVnVGFzayIsImV4cCI6MTcxOTYzMDA2OCwiaWF0IjoxNzE5NjI5MTY4fQ.olBj3F7aKIeq2u6Vn-cSq6THwRQxdqE9jSD7o3F7IiM",
+						"in": "header",
+						"key": "Megtask-Authentication-Token"
+					}
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\n        \"markAsCompleted\": true\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{baseURL}}/task/667f6ad3f6ced4b29045fa4c"
+			},
+			"response": [
+				{
+					"name": "Update Task Detail Successful",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\n        \"taskDetail\": \"Finish marathon race\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/task/667f6ad3f6ced4b29045fa4c"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 29 Jun 2024 02:32:12 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "348"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"name": "Content-Type",
+							"description": "",
+							"type": "text"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"tasks\": [\n        {\n            \"id\": \"667f6ad3f6ced4b29045fa4c\",\n            \"detail\": \"Finish marathon race\",\n            \"completed\": false,\n            \"timestamp\": 1719626451\n        },\n        {\n            \"id\": \"667f645afbaa8f8b550a9b0e\",\n            \"detail\": \"Wash the dish before dawn\",\n            \"completed\": false,\n            \"timestamp\": 1719624794\n        },\n        {\n            \"id\": \"667f6440fbaa8f8b550a9b0d\",\n            \"detail\": \"Finish task before dawn and eat\",\n            \"completed\": false,\n            \"timestamp\": 1719624768\n        }\n    ]\n}"
+				},
+				{
+					"name": "Update Task Status Successful",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\n        \"markAsCompleted\": true\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/task/667f6ad3f6ced4b29045fa4c"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 29 Jun 2024 02:41:00 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "448"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"name": "Content-Type",
+							"description": "",
+							"type": "text"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"tasks\": [\n        {\n            \"id\": \"667f73c2e554673326841c59\",\n            \"detail\": \"Go for workout\",\n            \"completed\": false,\n            \"timestamp\": 1719628738\n        },\n        {\n            \"id\": \"667f6ad3f6ced4b29045fa4c\",\n            \"detail\": \"Finish marathon race\",\n            \"completed\": true,\n            \"timestamp\": 1719626451\n        },\n        {\n            \"id\": \"667f645afbaa8f8b550a9b0e\",\n            \"detail\": \"Wash the dish before dawn\",\n            \"completed\": false,\n            \"timestamp\": 1719624794\n        },\n        {\n            \"id\": \"667f6440fbaa8f8b550a9b0d\",\n            \"detail\": \"Finish task before dawn and eat\",\n            \"completed\": false,\n            \"timestamp\": 1719624768\n        }\n    ]\n}"
+				},
+				{
+					"name": "Invalid Request",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\n        \"markAsCompleted\": true\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseURL}}/task/667f6ad3f6ced4b29045fa4c"
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 29 Jun 2024 02:46:22 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "69"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"name": "Content-Type",
+							"description": "",
+							"type": "text"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"errorMessage\": \"invalid request: completed tasks cannot be updated\"\n}"
+				}
+			]
+		},
+		{
+			"name": "task/{taskID}",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": {
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NjdmNGFjMzAwODBlNjk3MGQ2Y2YyZGMiLCJhdWQiOiJVc2VyIiwiaXNzIjoiTWVnVGFzayIsImV4cCI6MTcxOTYzMDg4MywiaWF0IjoxNzE5NjI5OTgzfQ.S1yENJaSV50e95R-pb7w5N8oKfkkovolynlazGgdlYc",
+						"in": "header",
+						"key": "Megtask-Authentication-Token"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": "{{baseURL}}/task/667f645afbaa8f8b550a9b0e"
+			},
+			"response": [
+				{
+					"name": "Delete Task Successful",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{baseURL}}/task/667f645afbaa8f8b550a9b0e"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 29 Jun 2024 02:59:59 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "336"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"name": "Content-Type",
+							"description": "",
+							"type": "text"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"tasks\": [\n        {\n            \"id\": \"667f73c2e554673326841c59\",\n            \"detail\": \"Go for workout\",\n            \"completed\": false,\n            \"timestamp\": 1719628738\n        },\n        {\n            \"id\": \"667f6ad3f6ced4b29045fa4c\",\n            \"detail\": \"Finish marathon race\",\n            \"completed\": true,\n            \"timestamp\": 1719626451\n        },\n        {\n            \"id\": \"667f6440fbaa8f8b550a9b0d\",\n            \"detail\": \"Finish task before dawn and eat\",\n            \"completed\": false,\n            \"timestamp\": 1719624768\n        }\n    ]\n}"
+				},
+				{
+					"name": "Invalid Request",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{baseURL}}/task/667f645afbaa8f8b550a9b0e"
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 29 Jun 2024 03:00:53 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "55"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"name": "Content-Type",
+							"description": "",
+							"type": "text"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"errorMessage\": \"invalid request: task does not exist\"\n}"
+				}
+			]
+		}
+	]
+}
