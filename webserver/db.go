@@ -22,7 +22,7 @@ type TaskDatabase interface {
 	TasksWithStatus(userID string, completed bool) ([]*db.Task, error)
 	// UpdateTask updates an existing task for the provided userID. If no task
 	// match the provided taskID, an ErrorInvalidRequest is returned.
-	UpdateTask(userID, taskID string, newTaskDetail string) ([]*db.Task, error)
+	UpdateTask(userID, taskID string, newTaskDetail string, markAsComplete *bool) ([]*db.Task, error)
 	// DeleteTask removes an existing task from the record of the user that
 	// match the provided userID. If no task match the provided taskID, an
 	// ErrorInvalidRequest is returned.

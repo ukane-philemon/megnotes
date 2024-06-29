@@ -1,6 +1,7 @@
 package mongodb
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"time"
@@ -8,6 +9,8 @@ import (
 	"github.com/ukane-philemon/megtask/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // CreateTask creates a new task entry for a user.
@@ -69,8 +72,54 @@ func (mdb *MongoDB) TasksWithStatus(userID string, completed bool) ([]*db.Task, 
 
 // UpdateTask updates an existing task for the provided userID. If no task
 // match the provided taskID, an ErrorInvalidRequest is returned.
-func (mdb *MongoDB) UpdateTask(userID, taskID string, newTaskDetail string) ([]*db.Task, error) {
-	return nil, nil
+func (mdb *MongoDB) UpdateTask(userID, taskID string, newTaskDetail string, markAsComplete *bool) ([]*db.Task, error) {
+	nothingToUpdate := (newTaskDetail == "" && markAsComplete == nil)
+	if userID == "" || taskID == "" || nothingToUpdate {
+		return nil, fmt.Errorf("%w: missing required argument(s)", db.ErrorInvalidRequest)
+	}
+
+	taskDBID, err := primitive.ObjectIDFromHex(taskID)
+	if err != nil {
+		return nil, fmt.Errorf("primitive.ObjectIDFromHex error: %w", err)
+	}
+
+	filter := bson.M{
+		ownerIDKey: userID,
+		dbIDKey:    taskDBID,
+	}
+
+	var task *dbTask
+	err = mdb.tasksCollection.FindOne(mdb.ctx, filter).Decode(&task)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("%w: task does not exist", db.ErrorInvalidRequest)
+		}
+		return nil, fmt.Errorf("tasksCollection.FindOne error: %w", err)
+	}
+
+	if task.Completed {
+		return nil, fmt.Errorf("%w: completed tasks cannot be updated", db.ErrorInvalidRequest)
+	}
+
+	update := make(bson.M, 0)
+	if newTaskDetail != "" {
+		update[taskDetailKey] = newTaskDetail
+	}
+
+	if markAsComplete != nil && *markAsComplete != false {
+		update[completedKey] = *markAsComplete
+	}
+
+	res, err := mdb.tasksCollection.UpdateOne(mdb.ctx, filter, bson.M{"$set": update}, options.Update().SetUpsert(false))
+	if err != nil {
+		return nil, fmt.Errorf("tasksCollection.UpdateOne error: %w", err)
+	}
+
+	if res.MatchedCount == 0 {
+		return nil, fmt.Errorf("task with id %s does not exist", taskID)
+	}
+
+	return mdb.userTasks(userID, nil)
 }
 
 // DeleteTask removes an existing task from the record of the user that
