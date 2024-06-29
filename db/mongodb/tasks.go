@@ -13,7 +13,7 @@ import (
 // CreateTask creates a new task entry for a user.
 func (mdb *MongoDB) CreateTask(userID string, taskDetail string) ([]*db.Task, error) {
 	if userID == "" || taskDetail == "" {
-		return nil, fmt.Errorf("%w: missing required arguments", db.ErrorInvalidRequest)
+		return nil, fmt.Errorf("%w: missing required argument(s)", db.ErrorInvalidRequest)
 	}
 
 	userDBID, err := primitive.ObjectIDFromHex(userID)
@@ -46,12 +46,25 @@ func (mdb *MongoDB) CreateTask(userID string, taskDetail string) ([]*db.Task, er
 		return nil, fmt.Errorf("tasksCollection.InsertOne error: %w", err)
 	}
 
-	return mdb.userTasks(userID)
+	return mdb.userTasks(userID, nil)
 }
 
 // Tasks returns all the tasks created by the provided userID.
 func (mdb *MongoDB) Tasks(userID string) ([]*db.Task, error) {
-	return nil, nil
+	if userID == "" {
+		return nil, fmt.Errorf("%w: missing required argument", db.ErrorInvalidRequest)
+	}
+
+	return mdb.userTasks(userID, nil)
+}
+
+// TasksWithStatus returns user tasks that matches the provided filter.
+func (mdb *MongoDB) TasksWithStatus(userID string, completed bool) ([]*db.Task, error) {
+	if userID == "" {
+		return nil, fmt.Errorf("%w: missing required argument", db.ErrorInvalidRequest)
+	}
+
+	return mdb.userTasks(userID, bson.M{completedKey: completed})
 }
 
 // UpdateTask updates an existing task for the provided userID. If no task
@@ -67,15 +80,15 @@ func (mdb *MongoDB) DeleteTask(userID, taskID string) ([]*db.Task, error) {
 	return nil, nil
 }
 
-// TasksWithStatus returns user tasks that match the provided filter.
-func (mdb *MongoDB) TasksWithStatus(userID string, completed bool) ([]*db.Task, error) {
-	return nil, nil
-}
-
 // userTasks returns a list of tasks for the user with the provided userID.
 // Tasks are sorted in descending order.
-func (mdb *MongoDB) userTasks(userID string) ([]*db.Task, error) {
-	cur, err := mdb.tasksCollection.Find(mdb.ctx, bson.M{ownerIDKey: userID})
+func (mdb *MongoDB) userTasks(userID string, extraFilter bson.M) ([]*db.Task, error) {
+	filter := bson.M{ownerIDKey: userID}
+	for key, val := range extraFilter {
+		filter[key] = val
+	}
+
+	cur, err := mdb.tasksCollection.Find(mdb.ctx, filter)
 	if err != nil {
 		return nil, fmt.Errorf("tasksCollection.Find error: %w", err)
 	}

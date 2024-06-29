@@ -59,7 +59,7 @@ func (mdb *MongoDB) Login(username, password string) (*db.User, error) {
 	}
 
 	userID := dbUser.ID.Hex()
-	tasks, err := mdb.userTasks(userID)
+	tasks, err := mdb.userTasks(userID, nil)
 	if err != nil {
 		mdb.log.Error("failed to retrieve user tasks: ", " error", err)
 	}
