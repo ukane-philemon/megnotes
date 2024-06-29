@@ -17,9 +17,12 @@ const (
 	taskDB = "megTasks"
 
 	usersCollection = "users"
+	taskCollection  = "tasks"
 
 	// Keys
+	dbIDKey     = "_id"
 	usernameKey = "username"
+	ownerIDKey  = "ownerID"
 )
 
 // Check that *MongoDB satisfies webserver.TaskDatabase.
@@ -30,6 +33,7 @@ type MongoDB struct {
 	ctx             context.Context
 	db              *mongo.Database
 	usersCollection *mongo.Collection
+	tasksCollection *mongo.Collection
 	log             *slog.Logger
 }
 
@@ -74,6 +78,7 @@ func New(ctx context.Context, connectionURL string, logger *slog.Logger) (*Mongo
 		ctx:             ctx,
 		db:              db,
 		usersCollection: usersCollection,
+		tasksCollection: db.Collection(taskCollection),
 		log:             logger,
 	}, nil
 }

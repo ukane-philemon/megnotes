@@ -2,6 +2,7 @@ package webserver
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/ukane-philemon/megtask/jwt"
 )
 
 // WebServer handles all routing and server logic.
@@ -16,23 +18,35 @@ type WebServer struct {
 	mux    *chi.Mux
 	log    *slog.Logger
 	taskDB TaskDatabase
+
+	jwtManager *jwt.Manager
 }
 
 // New returns a new instance of *WebServer.
-func New(db TaskDatabase, log *slog.Logger) *WebServer {
+func New(db TaskDatabase, logger *slog.Logger) (*WebServer, error) {
+	if logger == nil {
+		return nil, errors.New("logger is required")
+	}
+
+	jwtManager, err := jwt.NewJWTManager()
+	if err != nil {
+		return nil, fmt.Errorf("jwt.NewJWTManager error: %w", err)
+	}
+
 	chiMux := chi.NewMux()
 	chiMux.Use(middleware.Logger)
 	chiMux.Use(middleware.AllowContentType("application/json"))
 
 	server := &WebServer{
-		mux:    chiMux,
-		log:    log,
-		taskDB: db,
+		mux:        chiMux,
+		log:        logger,
+		taskDB:     db,
+		jwtManager: jwtManager,
 	}
 
 	server.registerRoutes()
 
-	return server
+	return server, nil
 }
 
 // Start starts the server and blocks until the server is stopped. All resources
@@ -88,6 +102,7 @@ func (s *WebServer) registerRoutes() {
 	s.mux.Get("/", s.handleHome)
 
 	s.mux.Post("/create-account", s.handleCreateAccount)
+	s.mux.Post("/login", s.handleLogin)
 }
 
 // handleHome handles the "GET /" endpoint and returns a server message.
