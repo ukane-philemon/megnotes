@@ -1,12 +1,11 @@
 package jwt
 
 import (
-	"crypto/ed25519"
-	"encoding/json"
+	"crypto/rand"
 	"fmt"
 	"time"
 
-	"github.com/cristalhq/jwt"
+	"github.com/cristalhq/jwt/v4"
 )
 
 const (
@@ -14,51 +13,50 @@ const (
 
 	JWTExpiry       = 15 * time.Minute
 	jwtAudienceUser = "User"
+	jwtAlg          = jwt.HS256
 )
 
 type Manager struct {
-	aud     string
-	signer  jwt.Signer
-	pubKey  ed25519.PublicKey
-	privKey ed25519.PrivateKey
-
-	builder   *jwt.TokenBuilder
-	validator *jwt.Validator
+	aud      string
+	builder  *jwt.Builder
+	verifier jwt.Verifier
 }
 
 // NewJWTManager returns a new manager for jwt tokens.
 func NewJWTManager() (*Manager, error) {
-	publicKey, privateKey, err := ed25519.GenerateKey(nil)
+	jwtSecret := make([]byte, 32)
+	_, err := rand.Read(jwtSecret)
 	if err != nil {
-		return nil, fmt.Errorf("ed25519.GenerateKey error: %w", err)
+		return nil, fmt.Errorf("rand.Read error: %w", err)
 	}
 
-	signer, err := jwt.NewEdDSA(publicKey, privateKey)
+	signer, err := jwt.NewSignerHS(jwtAlg, jwtSecret)
 	if err != nil {
-		return nil, fmt.Errorf("jwt.NewEdDSA error: %w", err)
+		return nil, fmt.Errorf("jwt.NewSignerHS error: %w", err)
+	}
+
+	verifier, err := jwt.NewVerifierHS(jwtAlg, jwtSecret[:])
+	if err != nil {
+		return nil, fmt.Errorf("jwt.NewVerifierHS error: %w", err)
 	}
 
 	m := &Manager{
-		aud:     jwtAudienceUser,
-		signer:  signer,
-		pubKey:  publicKey,
-		privKey: privateKey,
-		builder: jwt.NewTokenBuilder(signer),
+		aud:      jwtAudienceUser,
+		builder:  jwt.NewBuilder(signer),
+		verifier: verifier,
 	}
-
-	m.validator = jwt.NewValidator(jwt.AudienceChecker(jwt.Audience{m.aud}), jwt.ValidAtNowChecker(), jwt.IssuerChecker(jwtIssuer), jwt.ValidAtNowChecker())
 
 	return m, nil
 }
 
 // GenerateJWtToken generates a new jwt token for the specified id.
 func (m *Manager) GenerateJWtToken(id string) (string, error) {
-	claims := jwt.StandardClaims{
-		Audience:  []string{m.aud},
-		ExpiresAt: jwt.Timestamp(time.Now().Add(JWTExpiry).Unix()),
+	claims := &jwt.RegisteredClaims{
 		ID:        id,
-		IssuedAt:  jwt.Timestamp(time.Now().Unix()),
+		Audience:  jwt.Audience{jwtAudienceUser},
 		Issuer:    jwtIssuer,
+		IssuedAt:  jwt.NewNumericDate(time.Now()),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(JWTExpiry)),
 	}
 
 	token, err := m.builder.Build(claims)
@@ -72,21 +70,11 @@ func (m *Manager) GenerateJWtToken(id string) (string, error) {
 // IsValidToken checks that the provided token is valid and returns the unique
 // id added to the auth token.
 func (m *Manager) IsValidToken(jwtToken string) (string, bool) {
-	token, err := jwt.ParseAndVerifyString(jwtToken, m.signer)
-	if err != nil {
+	jwtClaims := new(jwt.RegisteredClaims)
+	err := jwt.ParseClaims([]byte(jwtToken), m.verifier, jwtClaims)
+	if err != nil || !(jwtClaims.IsIssuer(jwtIssuer) && jwtClaims.IsValidAt(time.Now())) || !jwtClaims.IsForAudience(m.aud) {
 		return "", false
 	}
 
-	var claims *jwt.StandardClaims
-	err = json.Unmarshal(token.RawClaims(), &claims)
-	if err != nil {
-		return "", false
-	}
-
-	err = m.validator.Validate(claims)
-	if err != nil {
-		return "", false
-	}
-
-	return claims.ID, true
+	return jwtClaims.ID, true
 }

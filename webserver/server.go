@@ -103,6 +103,13 @@ func (s *WebServer) registerRoutes() {
 
 	s.mux.Post("/create-account", s.handleCreateAccount)
 	s.mux.Post("/login", s.handleLogin)
+
+	// Endpoints the require authentication.
+	s.mux.Group(func(authedMux chi.Router) {
+		authedMux.Use(s.authMiddleware)
+
+		authedMux.Post("/task", s.handleCreateTask)
+	})
 }
 
 // handleHome handles the "GET /" endpoint and returns a server message.

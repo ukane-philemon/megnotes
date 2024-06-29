@@ -13,7 +13,7 @@ type dbUser struct {
 }
 
 type dbTask struct {
-	ID      primitive.ObjectID `bson:"_id"`
-	OwnerID string             `bson:"ownerID"`
-	db.TaskInfo
+	ID          primitive.ObjectID `bson:"_id"`
+	OwnerID     string             `bson:"ownerID"`
+	db.TaskInfo `bson:"inline"`
 }

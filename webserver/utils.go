@@ -17,37 +17,30 @@ func (s *WebServer) readPostBody(res http.ResponseWriter, req *http.Request, bod
 
 // writeSuccess writes a success response.
 func (s *WebServer) writeSuccess(res http.ResponseWriter, respBody any) {
-	res.WriteHeader(http.StatusOK)
-	responseBytes, err := json.Marshal(respBody)
-	if err != nil {
-		s.log.Error("json.Marshal failed to send response: ", "error", err)
-	}
-	res.Write(responseBytes)
+	s.writeJSONResponse(res, http.StatusOK, respBody)
 }
 
 // writeBadRequest writes an http.StatusBadRequest to the response header and an
 // errorMessage.
 func (s *WebServer) writeBadRequest(res http.ResponseWriter, errorMessage string) {
-	res.WriteHeader(http.StatusBadRequest)
-	responseBytes, err := json.Marshal(map[string]string{
+	s.writeJSONResponse(res, http.StatusBadRequest, map[string]string{
 		"errorMessage": errorMessage,
 	})
-	if err != nil {
-		s.log.Error("json.Marshal failed to send bad request: ", "error", err)
-	}
-	res.Write(responseBytes)
 }
 
 // writeServerError writes a server error and logs the provided error.
 func (s *WebServer) writeServerError(res http.ResponseWriter, serverErr error) {
 	s.log.Error("Server error: ", "err", serverErr)
-
-	res.WriteHeader(http.StatusInternalServerError)
-	responseBytes, err := json.Marshal(map[string]string{
-		"errorMessage": "Something unexpected happened. Sorry, try again.",
+	s.writeJSONResponse(res, http.StatusInternalServerError, map[string]string{
+		"errorMessage": "Something unexpected happened, please try again later.",
 	})
+}
+
+func (s *WebServer) writeJSONResponse(res http.ResponseWriter, code int, resp any) {
+	res.WriteHeader(code)
+	responseBytes, err := json.Marshal(resp)
 	if err != nil {
-		s.log.Error("json.Marshal failed to send server error: ", "error", err)
+		s.log.Error("json.Marshal failed: ", "error", err)
 	}
 	res.Write(responseBytes)
 }
